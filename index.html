@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>مدیریت شیفت صبح و شب</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main id="loginScreen" class="login-screen">
+    <section class="login-card" aria-labelledby="loginTitle">
+      <p class="brand">Shift Desk</p>
+      <h1 id="loginTitle">ورود به مدیریت شیفت</h1>
+      <p class="hint">نام کاربری و رمز عبور خود را وارد کنید.</p>
+      <form id="loginForm" class="login-form">
+        <label>
+          نام کاربری
+          <input id="loginUsername" type="text" autocomplete="username" required autofocus />
+        </label>
+        <label>
+          رمز عبور
+          <input id="loginPassword" type="password" autocomplete="current-password" required />
+        </label>
+        <p id="loginError" class="login-error" role="alert" aria-live="polite"></p>
+        <button type="submit" class="btn">ورود</button>
+      </form>
+    </section>
+  </main>
+
+  <div class="app" id="appRoot" hidden>
+    <aside class="user-bar">
+      <div>
+        <span>کاربر واردشده:</span>
+        <strong id="currentUserName"></strong>
+        <small id="currentUserRole"></small>
+      </div>
+      <button type="button" id="logoutBtn" class="btn ghost">خروج</button>
+    </aside>
+    <header class="hero">
+      <div class="hero-copy">
+        <p class="brand">Shift Desk</p>
+        <h1>مدیریت شیفت صبح و شب</h1>
+        <p class="lede">تقویم رسمی ایران + چرخش هفتگی صبح/شب بین حامد مقدسی و مهدی ارجمندزاده</p>
+      </div>
+      <div class="hero-stats" id="monthSummary"></div>
+    </header>
+
+    <section class="toolbar">
+      <div class="nav">
+        <button type="button" id="prevMonth" class="btn ghost">ماه قبل</button>
+        <h2 id="monthTitle"></h2>
+        <button type="button" id="nextMonth" class="btn ghost">ماه بعد</button>
+      </div>
+      <div class="actions">
+        <button type="button" id="todayBtn" class="btn">برو به امروز</button>
+        <button type="button" id="exportBtn" class="btn secondary">خروجی CSV</button>
+        <button type="button" id="exportExcelBtn" class="btn secondary">خروجی اکسل افقی</button>
+        <label class="inline-field">
+          ماه جلوتر
+          <input id="forwardCount" type="number" min="1" max="24" value="6" />
+        </label>
+        <button type="button" id="exportForwardBtn" class="btn secondary">ادامه الگو</button>
+        <button type="button" id="exportYearEndBtn" class="btn secondary">تا آخر ۱۴۰۵</button>
+      </div>
+    </section>
+
+    <section class="legend">
+      <span><i class="dot hamed"></i> حامد مقدسی</span>
+      <span><i class="dot mehdi"></i> مهدی ارجمندزاده</span>
+      <span><i class="dot morning"></i> صبح</span>
+      <span><i class="dot night"></i> شب</span>
+      <span><i class="dot holiday"></i> تعطیل رسمی</span>
+      <span><i class="dot company"></i> تعطیل شرکت</span>
+      <span><i class="dot thursday-off"></i> آف پنج‌شنبه</span>
+    </section>
+
+    <section class="calendar-wrap">
+      <div class="weekdays">
+        <span>ش</span><span>ی</span><span>د</span><span>س</span><span>چ</span><span>پ</span><span>ج</span>
+      </div>
+      <div class="calendar" id="calendar"></div>
+    </section>
+
+    <section class="panel roster-editor-panel">
+      <div class="roster-editor-heading">
+        <div>
+          <h3>ویرایش دستی برنامه (جدول شیفت)</h3>
+          <p class="hint" id="rosterEditHint">
+            روی هر خانه کلیک کنید و از لیست «صبح»، «شب» یا «خالی (آف)» را انتخاب کنید.
+            تغییرات ذخیره می‌شوند و در گزارش و اکسل هم اعمال می‌گردند.
+          </p>
+        </div>
+        <button type="button" id="clearOverridesBtn" class="btn ghost" data-admin-only>پاک‌کردن ویرایش‌های این دوره</button>
+      </div>
+      <div class="roster-scroll">
+        <div id="rosterEditor" class="roster-editor"></div>
+      </div>
+    </section>
+
+    <section class="panel official-holidays-panel">
+      <h3 id="officialHolidaysHeading">تعطیلات رسمی این دوره</h3>
+      <ul id="officialHolidaysList" class="official-holidays-list"></ul>
+    </section>
+
+    <section class="panels">
+      <article class="panel">
+        <h3>لیست شیفت ماه</h3>
+        <div id="shiftList" class="shift-list"></div>
+      </article>
+
+      <article class="panel">
+        <h3>پنج‌شنبه‌های تعطیلی شرکت</h3>
+        <p class="viewer-notice" data-viewer-only hidden>فقط مدیر می‌تواند تعطیلی‌های شرکت را تغییر دهد.</p>
+        <p class="hint" id="thursdayHint">
+          فقط پنج‌شنبه‌هایی را که واقعاً تعطیل شرکت هستند علامت بزنید.
+          برای این روزها فقط شیفت صبح OFF می‌شود و شب برقرار است.
+        </p>
+        <div id="thursdayCompanyList" class="thursday-list"></div>
+        <button type="button" id="saveThursdayBtn" class="btn" data-admin-only>ذخیره پنج‌شنبه‌های تعطیل</button>
+
+        <h3 class="subhead">سایر تعطیلی‌های شرکت</h3>
+        <p class="hint">تاریخ‌های غیرپنج‌شنبه (یا هر تاریخ دلخواه) را اینجا اضافه کنید.</p>
+        <form id="companyForm" class="form" data-admin-only>
+          <label>
+            تاریخ شمسی
+            <input id="companyDate" type="text" placeholder="1405/05/25" required />
+          </label>
+          <label>
+            عنوان
+            <input id="companyTitle" type="text" placeholder="تعطیلی داخلی" required />
+          </label>
+          <button type="submit" class="btn">افزودن</button>
+        </form>
+        <ul id="companyList" class="company-list"></ul>
+      </article>
+
+      <article class="panel">
+        <h3>تنظیمات چرخش و آف ماه</h3>
+        <p class="viewer-notice" data-viewer-only hidden>تنظیمات فقط توسط مدیر قابل ویرایش است.</p>
+        <label class="switch-row">
+          <input type="checkbox" id="periodMode" />
+          <span>دوره ۲۱ تا ۲۰ ماه بعد (مثل شیت اکسل)</span>
+        </label>
+        <label class="switch-row">
+          <input type="checkbox" id="skipHolidays" />
+          <span>در تعطیلی شرکت، کل روز OFF باشد</span>
+        </label>
+        <label class="field">
+          هفته اول: نفر صبح
+          <select id="startPerson">
+            <option value="hamed">حامد مقدسی صبح / مهدی شب</option>
+            <option value="mehdi">مهدی ارجمندزاده صبح / حامد شب</option>
+          </select>
+        </label>
+        <p class="hint" id="rotationHint"></p>
+
+        <div class="quota-box">
+          <h4 id="quotaMonthTitle">آف‌های ماهانه (ورود کاربر)</h4>
+          <p class="hint">
+            اگر عدد خالی یا ۰ باشد، هیچ آف برنامه‌ای اضافه نمی‌شود؛ فقط قوانین
+            ثابت (شنبه و جمعه صبح، تعطیل رسمی صبح، جبرانی شب) اعمال می‌شوند.
+          </p>
+          <div class="quota-grid total-quota">
+            <label>
+              تعداد کل آف‌های عادی
+              <input id="totalNormalOff" type="number" min="0" step="1" placeholder="0" />
+            </label>
+            <label>
+              تعداد روزهای آف پنج‌شنبه
+              <input id="totalThursdayOff" type="number" min="0" step="1" placeholder="0" />
+            </label>
+          </div>
+          <p class="hint person-quota-title">اختیاری — سهم هر نفر (اگر پر نشود از تعداد کل استفاده می‌شود):</p>
+          <div class="quota-grid">
+            <strong>نفر</strong>
+            <strong>آف عادی</strong>
+            <strong>آف پنج‌شنبه</strong>
+
+            <span>حامد مقدسی</span>
+            <input id="hamedNormalOff" type="number" min="0" placeholder="—" />
+            <input id="hamedThursdayOff" type="number" min="0" placeholder="—" />
+
+            <span>مهدی ارجمندزاده</span>
+            <input id="mehdiNormalOff" type="number" min="0" placeholder="—" />
+            <input id="mehdiThursdayOff" type="number" min="0" placeholder="—" />
+          </div>
+          <button type="button" id="saveQuotaBtn" class="btn" data-admin-only>ذخیره تعداد آف‌های ماه</button>
+          <p class="hint">
+            شنبه و جمعه: صبح OFF · تعطیل رسمی: صبح OFF و شب برقرار ·
+            پنج‌شنبه تعطیل (رسمی یا شرکت): فقط صبح OFF و شب برقرار ·
+            شب‌کار تعطیل رسمی در اولین نوبت صبح مناسب آف جبرانی می‌گیرد ·
+            آف پنج‌شنبه جدا از آف عادی.
+          </p>
+        </div>
+      </article>
+    </section>
+
+    <section class="off-report" aria-labelledby="offReportTitle">
+      <div class="off-report-heading">
+        <div>
+          <p class="report-kicker">گزارش پایان برنامه</p>
+          <h2 id="offReportTitle">گزارش کارکرد و OFF هر نفر</h2>
+        </div>
+        <p>محاسبه‌شده از برنامه نهایی پس از اعمال تعطیلی‌ها، جبرانی‌ها، سهمیه‌ها و ویرایش دستی</p>
+      </div>
+      <div id="offReportBody" class="off-report-body"></div>
+    </section>
+  </div>
+
+  <script src="jalaali.js"></script>
+  <script src="holidays.js"></script>
+  <script src="auth.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
