@@ -1,0 +1,19 @@
+---
+description: Shift rotation, holidays, OFF quotas, and cell labels
+alwaysApply: true
+---
+
+# Shift rules
+
+- Jalali calendar; official holidays in `holidays.js` (`IRAN_HOLIDAYS` 1403–1405).
+- Week starts **Friday**. Weekly rotation: one week morning/night, next week swapped.
+- Default **period mode**: 21st of month → 20th of next month (`PERIOD_START_DAY = 21`).
+- Saturday & Friday: morning person OFF; night still works.
+- Official + company holidays: morning OFF only; night works; compensatory OFF later on a morning day. Compensatory cells are **blank**, not labeled «جبرانی شب».
+- Company Thursday holidays: admin ticks in UI.
+- Monthly quotas: user enters normal OFF count + Thursday OFF count (optional per person).
+- Cell labels: **صبح / شب / خالی**. No «OFF» text in boxes.
+- Manual cell dropdown (صبح / شب / خالی): **admin only**. Viewers cannot edit.
+- Hardcoded Hamed overrides in `app.js`: OFF on 29 Mordad and 9 Shahrivar 1405; work (not OFF) on 25–26 Mordad; OFF moved from 22 to 29 Mordad.
+- End report: day shifts, Thursdays worked, OFFs, Friday/official holidays.
+- Export: CSV, horizontal Excel, continue pattern, until end of 1405.

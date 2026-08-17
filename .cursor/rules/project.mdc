@@ -1,0 +1,25 @@
+---
+description: Shift management app identity, files, live URL, and deploy
+alwaysApply: true
+---
+
+# Shift Management
+
+Static Persian night/morning scheduler for حامد مقدسی (`hamed`) and مهدی ارجمندزاده (`mehdi`). Admin is محمود شعبانی.
+
+Path: `D:\Mahmoud\shift-management`
+Repo: `https://github.com/shabanimahmoud92-design/shift`
+Live (permanent): **https://shabanimahmoud92-design.github.io/shift/**
+
+## Files
+
+- `index.html`, `styles.css`, `app.js`, `auth.js`, `holidays.js`, `jalaali.js`
+- Company Thursday holidays + OFF quotas live in `localStorage` (not shared across browsers)
+- `publish.bat` = `git add` + commit + push to `origin/main` (GitHub Pages auto-updates in 1–2 min)
+
+## Deploy
+
+- GitHub Pages from `main` `/` (legacy). Do not use tiiny/Netlify Drop — they expire.
+- After CSS/JS changes, tell the user to hard-refresh (`Ctrl+Shift+R`).
+- Layout is full-width (no 1180px cap).
+- Talk to the user in Persian, short and fast.

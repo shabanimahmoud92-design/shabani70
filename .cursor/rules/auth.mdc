@@ -1,0 +1,16 @@
+---
+description: Login accounts and roles for the shift app
+alwaysApply: true
+---
+
+# Auth
+
+Client-side only (`auth.js` + `sessionStorage`). Not secure for real production.
+
+| User | Password | Role |
+|------|----------|------|
+| `admin` | `admin123` | Full edit |
+| `hamed` | `hamed123` | View only |
+| `mehdi` | `mehdi123` | View only |
+
+Do not remove login. Keep passwords in sync if `auth.js` and `SHARE.md` both list them.
