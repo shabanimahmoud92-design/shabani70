@@ -1,29 +1,57 @@
-# لینک قابل‌اشتراک
+# لینک دائمی برنامه شیفت
 
-از این محیط Cursor نمی‌توان سرور عمومی ساخت. یکی از این دو راه را بروید:
+## لینک پیشنهادی (دائمی — GitHub Pages)
 
-## روش ۱ — Netlify Drop (۳۰ ثانیه، پیشنهادی)
+کد شما روی GitHub است:  
+https://github.com/shabanimahmoud92-design/shabani70
 
-1. بروید به: https://app.netlify.com/drop
-2. کل پوشه زیر را بکشید داخل صفحه:
+بعد از فعال‌سازی GitHub Pages، لینک ثابت این می‌شود:
 
-`D:\mahmoud\shift-management`
+**https://shabanimahmoud92-design.github.io/shabani70/**
 
-3. لینک `https://....netlify.app` می‌دهد — همان را برای همه بفرستید.
+### فعال‌سازی (یک‌بار)
 
-## روش ۲ — فایل publish.bat
+1. بروید به: https://github.com/shabanimahmoud92-design/shabani70/settings/pages
+2. **Build and deployment** → **Source**: `Deploy from a branch`
+3. **Branch**: `main` — **Folder**: `/ (root)
+4. **Save** بزنید
+5. ۱–۳ دقیقه صبر کنید؛ صفحه سبز می‌شود و لینk بالا کار می‌کند
 
-دوبار کلیک روی:
+### اگر فایل `.nojekyll` را تازه اضافه کردید
 
-`D:\mahmoud\shift-management\publish.bat`
+در PowerShell:
 
-این اسکریپت به‌صورت خودکار:
+```powershell
+cd D:\Mahmoud\shift-management
+git add .nojekyll SHARE.md
+git commit -m "Enable GitHub Pages"
+git push origin main
+```
 
-1. صفحه https://app.netlify.com/drop را در مرورگر پیش‌فرض باز می‌کند
-2. پوشه `D:\mahmoud\shift-management` را در Explorer باز می‌کند تا بتوانید کل پوشه را بکشید و داخل صفحه Netlify رها کنید
+---
 
-سپس لینک `https://....netlify.app` را برای همه بفرستید.
+## روش سریع (موقت — Netlify Drop)
+
+لینk قبلی (`cute-sundae-542ec5.netlify.app`) منقضی شده است.
+
+1. دوبار کلیک روی `publish.bat` (یا بروید https://app.netlify.com/drop)
+2. کل پوشه `D:\Mahmoud\shift-management` را بکشید داخل صفحه
+3. لینk جدید `https://....netlify.app` می‌گیرید
+4. **Claim this site** بزنید و با Netlify لاگین کنید تا لینk دائمی شود
+
+---
+
+## ورود به برنامه
+
+| کاربر | رمز |
+|-------|-----|
+| admin | admin123 |
+| hamed | hamed123 |
+| mehdi | mehdi123 |
+
+---
 
 ## توجه
 
-تعطیلی‌های شرکتی هر نفر در مرورگر خودش ذخیره می‌شود (localStorage) و بین افراد همگام نیست.
+- تعطیلی‌های شرکتی در مرورگر هر نفر (localStorage) ذخیره می‌شود.
+- رمزها فقط سمت مرورگر هستند؛ برای محیط عمومی حساس مناسب نیست.
