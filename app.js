@@ -638,6 +638,8 @@
     let hamedNight = 0;
     let mehdiMorning = 0;
     let mehdiNight = 0;
+    let official = 0;
+    let company = 0;
     days.forEach((day) => {
       const h = codeFor("hamed", day);
       const m = codeFor("mehdi", day);
@@ -645,10 +647,14 @@
       if (h === "شب") hamedNight += 1;
       if (m === "صبح") mehdiMorning += 1;
       if (m === "شب") mehdiNight += 1;
+      if (day.isOfficial) official += 1;
+      if (day.isCompany) company += 1;
     });
     document.getElementById("monthSummary").innerHTML = `
       <div class="stat"><span>حامد صبح / شب</span><strong>${hamedMorning} / ${hamedNight}</strong></div>
       <div class="stat"><span>مهدی صبح / شب</span><strong>${mehdiMorning} / ${mehdiNight}</strong></div>
+      <div class="stat"><span>تعطیل رسمی دوره</span><strong>${official}</strong></div>
+      <div class="stat"><span>تعطیل شرکت</span><strong>${company}</strong></div>
     `;
   }
 
@@ -986,12 +992,173 @@
     renderAll();
   }
 
+  function addJalaliDays(jy, jm, jd, n) {
+    const g = Jalaali.toGregorian(jy, jm, jd);
+    const dt = new Date(g.gy, g.gm - 1, g.gd);
+    dt.setDate(dt.getDate() + n);
+    return Jalaali.toJalaali(dt.getFullYear(), dt.getMonth() + 1, dt.getDate());
+  }
+
+  function periodOf(jy, jm, jd) {
+    if (!state.periodMode || jd >= PERIOD_START_DAY) return { jy, jm };
+    return jm === 1 ? { jy: jy - 1, jm: 12 } : { jy, jm: jm - 1 };
+  }
+
+  function assignedDaysFor(jy, jm) {
+    return assignShifts(buildDays(jy, jm), { quotaJy: jy, quotaJm: jm });
+  }
+
+  function findDay(days, jy, jm, jd) {
+    return days.find((d) => d.jy === jy && d.jm === jm && d.jd === jd) || null;
+  }
+
+  function whoWorks(day) {
+    if (!day) return { morning: "—", night: "—" };
+    const morning =
+      ["hamed", "mehdi"].find((id) => codeFor(id, day) === "صبح");
+    const night =
+      ["hamed", "mehdi"].find((id) => codeFor(id, day) === "شب");
+    return {
+      morning: morning ? resolvePerson(morning).fullName : "بدون شیفت صبح",
+      night: night ? resolvePerson(night).fullName : "بدون شیفت شب",
+      morningId: morning || "",
+      nightId: night || "",
+    };
+  }
+
+  function renderDutyBoard() {
+    const root = document.getElementById("dutyBoard");
+    if (!root) return;
+    const today = todayJalali();
+    const tomorrow = addJalaliDays(today.jy, today.jm, today.jd, 1);
+    const p = periodOf(today.jy, today.jm, today.jd);
+    const days = assignedDaysFor(p.jy, p.jm);
+    const todayDay = findDay(days, today.jy, today.jm, today.jd);
+    const tomorrowDay = findDay(days, tomorrow.jy, tomorrow.jm, tomorrow.jd)
+      || findDay(
+          assignedDaysFor(periodOf(tomorrow.jy, tomorrow.jm, tomorrow.jd).jy, periodOf(tomorrow.jy, tomorrow.jm, tomorrow.jd).jm),
+          tomorrow.jy,
+          tomorrow.jm,
+          tomorrow.jd
+        );
+    const now = whoWorks(todayDay);
+    const next = whoWorks(tomorrowDay);
+    const wd = weekdayName(today.jy, today.jm, today.jd);
+    const dateLabel = `${today.jd} ${MONTH_NAMES[today.jm - 1]} ${today.jy}`;
+    const holidayNote = todayDay?.isOfficial
+      ? "تعطیل رسمی"
+      : todayDay?.isCompany
+        ? "تعطیل شرکت"
+        : todayDay?.isFriday
+          ? "جمعه"
+          : "";
+    root.innerHTML = `
+      <div class="duty-now">
+        <p class="duty-kicker">تابلو لحظه‌ای</p>
+        <h2>امروز ${wd} ${dateLabel}</h2>
+        ${holidayNote ? `<span class="duty-flag">${holidayNote}</span>` : ""}
+      </div>
+      <div class="duty-card morning ${now.morningId}">
+        <span>شیفت صبح</span>
+        <strong>${now.morning}</strong>
+      </div>
+      <div class="duty-card night ${now.nightId}">
+        <span>شیفت شب</span>
+        <strong>${now.night}</strong>
+      </div>
+      <div class="duty-tomorrow">
+        <span>فردا</span>
+        <strong>صبح ${next.morning}</strong>
+        <strong>شب ${next.night}</strong>
+      </div>
+    `;
+  }
+
+  function printTableHtml(days) {
+    const weekdayCells = days
+      .map((d) => `<th>${weekdayName(d.jy, d.jm, d.jd).slice(0, 1)}</th>`)
+      .join("");
+    const dateCells = days.map((d) => `<th>${d.jd}</th>`).join("");
+    const row = (personId) =>
+      days
+        .map((d) => {
+          const code = codeFor(personId, d) || "—";
+          const cls = code === "صبح" ? "morning" : code === "شب" ? "night" : "empty";
+          return `<td class="${cls}">${code}</td>`;
+        })
+        .join("");
+    return `<table>
+      <thead>
+        <tr><th colspan="2">نفرات</th>${weekdayCells}</tr>
+        <tr><th colspan="2"></th>${dateCells}</tr>
+      </thead>
+      <tbody>
+        <tr><th colspan="2">ارجمندزاده</th>${row("mehdi")}</tr>
+        <tr><th colspan="2">مقدسی</th>${row("hamed")}</tr>
+      </tbody>
+    </table>`;
+  }
+
+  function renderPrintPoster(days) {
+    const el = document.getElementById("printPoster");
+    if (!el) return;
+    const today = todayJalali();
+    const now = whoWorks(findDay(days, today.jy, today.jm, today.jd) || days[0]);
+    el.innerHTML = `
+      <p class="print-brand">Shift Desk · تابلو شیفت دیواری</p>
+      <h1>${periodTitle()}</h1>
+      <p class="print-today">امروز: صبح ${now.morning} · شب ${now.night}</p>
+      ${printTableHtml(days)}
+      <p class="print-foot">صبح / شب / خالی = آف · چاپ ${today.jd} ${MONTH_NAMES[today.jm - 1]} ${today.jy}</p>
+    `;
+  }
+
+  function managerBriefText(days) {
+    const today = todayJalali();
+    const p = periodOf(today.jy, today.jm, today.jd);
+    const liveDays = assignedDaysFor(p.jy, p.jm);
+    const todayDay = findDay(liveDays, today.jy, today.jm, today.jd);
+    const now = whoWorks(todayDay);
+    const tomorrow = addJalaliDays(today.jy, today.jm, today.jd, 1);
+    const next = whoWorks(findDay(liveDays, tomorrow.jy, tomorrow.jm, tomorrow.jd));
+    const summary = rosterSummaryFor(days);
+    const line = (id) => {
+      const s = summary[id];
+      const ppl = resolvePerson(id);
+      return `${ppl.fullName}: ${s.dayShifts} صبح · ${s.workedThursdays} پنج‌شنبه کارکرده · ${s.total} آف`;
+    };
+    return [
+      `تابلو شیفت — ${today.jd} ${MONTH_NAMES[today.jm - 1]} ${today.jy} (${weekdayName(today.jy, today.jm, today.jd)})`,
+      `صبح: ${now.morning}`,
+      `شب: ${now.night}`,
+      `فردا صبح: ${next.morning} · فردا شب: ${next.night}`,
+      `دوره: ${periodTitle()}`,
+      line("hamed"),
+      line("mehdi"),
+      "لینک: https://shabanimahmoud92-design.github.io/shift/",
+    ].join("\n");
+  }
+
+  function copyManagerBrief(days) {
+    const text = managerBriefText(days);
+    const done = () => alert("خلاصه کپی شد. می‌توانید در واتساپ یا ایمیل برای مدیر بفرستید.");
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(text).then(done).catch(() => {
+        window.prompt("متن را کپی کنید:", text);
+      });
+    } else {
+      window.prompt("متن را کپی کنید:", text);
+    }
+  }
+
   function renderAll() {
     const days = assignShifts(buildDays(state.jy, state.jm), {
       quotaJy: state.jy,
       quotaJm: state.jm,
     });
     renderSummary(days);
+    renderDutyBoard();
+    renderPrintPoster(days);
     renderOffReport(days);
     renderCalendar(days);
     renderRosterEditor(days);
@@ -1330,6 +1497,13 @@ ${tablesHtml}
       state.jy = now.jy;
       state.jm = now.jm;
       renderAll();
+    });
+
+    document.getElementById("printPosterBtn").addEventListener("click", () => {
+      window.print();
+    });
+    document.getElementById("copyBriefBtn").addEventListener("click", () => {
+      copyManagerBrief(renderAll());
     });
 
     document.getElementById("exportBtn").addEventListener("click", exportCsv);

@@ -75,6 +75,106 @@ body {
   padding: 1.5rem 1.25rem 3rem;
 }
 
+.duty-board {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom: 1.1rem;
+}
+
+.duty-now,
+.duty-card,
+.duty-tomorrow {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1rem 1.1rem;
+}
+
+.duty-kicker {
+  margin: 0 0 0.25rem;
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.duty-now h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  line-height: 1.4;
+}
+
+.duty-flag {
+  display: inline-block;
+  margin-top: 0.45rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: #fde8ea;
+  color: var(--holiday);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.duty-card span,
+.duty-tomorrow span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.8rem;
+  margin-bottom: 0.3rem;
+}
+
+.duty-card strong,
+.duty-tomorrow strong {
+  display: block;
+  font-size: 1.15rem;
+}
+
+.duty-card.morning { border-top: 4px solid #2a8f4c; }
+.duty-card.night { border-top: 4px solid #1d4e89; }
+.duty-card.hamed strong { color: var(--hamed); }
+.duty-card.mehdi strong { color: var(--mehdi); }
+
+.print-poster { display: none; }
+
+@media print {
+  @page { size: A4 landscape; margin: 10mm; }
+  body {
+    background: #fff !important;
+    color: #000;
+  }
+  body > *:not(.print-poster) { display: none !important; }
+  .print-poster {
+    display: block !important;
+  }
+  .print-brand {
+    margin: 0;
+    font-weight: 700;
+    color: #16324f;
+  }
+  .print-poster h1 {
+    margin: 0.2rem 0 0.4rem;
+    font-size: 1.4rem;
+  }
+  .print-today { margin: 0 0 0.6rem; }
+  .print-poster table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+  }
+  .print-poster th,
+  .print-poster td {
+    border: 1px solid #999;
+    padding: 4px 3px;
+    text-align: center;
+  }
+  .print-poster td.morning { background: #e8f6ec; }
+  .print-poster td.night { background: #e7eef8; }
+  .print-poster td.empty { background: #f4f4f4; color: #777; }
+  .print-foot { margin: 0.6rem 0 0; font-size: 0.8rem; color: #555; }
+}
+
 .user-bar {
   display: flex;
   justify-content: space-between;
@@ -686,6 +786,7 @@ input, select {
 
 @media (max-width: 960px) {
   .hero, .panels, .toolbar { grid-template-columns: 1fr; display: grid; }
+  .duty-board { grid-template-columns: 1fr 1fr; }
   .toolbar { justify-content: stretch; }
   .nav, .actions { justify-content: center; }
   .day { min-height: 6.5rem; }
