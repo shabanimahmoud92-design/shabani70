@@ -1,10 +1,10 @@
 # لینک برنامه شیفت
 
-## لینک دائمی (فعال)
+## لینک کوتاه (بدون shabani)
 
-**https://shabanimahmoud92-design.github.io/shift/**
+**https://orange-edith-55.tiiny.site**
 
-می‌توانید این لینک را برای حامد و مهدی بفرستید.
+این لینک مستقیم به برنامه می‌رود و در نام آن «shabani» نیست.
 
 ---
 
@@ -18,16 +18,12 @@
 
 ---
 
-## به‌روزرسانی بعد از تغییر کد
+## به‌روزرسانی سایت
 
 ```powershell
 cd D:\Mahmoud\shift-management
-git add .
-git commit -m "update"
-git push origin main
+.\deploy-short.ps1
 ```
-
-بعد از push، GitHub Pages خودکار به‌روز می‌شود (۱–۲ دقیقه).
 
 ---
 
