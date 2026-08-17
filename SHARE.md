@@ -2,7 +2,7 @@
 
 ## لینک دائمی (فعال)
 
-**https://shabanimahmoud92-design.github.io/shabani70/**
+**https://shabanimahmoud92-design.github.io/shift/**
 
 می‌توانید این لینک را برای حامد و مهدی بفرستید.
 
