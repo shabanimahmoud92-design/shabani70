@@ -70,9 +70,9 @@ body {
 }
 
 .app {
-  width: min(1180px, calc(100% - 2rem));
-  margin: 0 auto;
-  padding: 1.5rem 0 3rem;
+  width: 100%;
+  margin: 0;
+  padding: 1.5rem 1.25rem 3rem;
 }
 
 .user-bar {
